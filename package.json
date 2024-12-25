@@ -2,15 +2,13 @@
   "name": "ygg_sherpa_bot",
   "scripts": {
     "start": "node dist/server.js",
-    "dev-1": "nodemon dist/server.js",
-    "dev-2": "nodemon --watch src --exec 'npx tsc && node dist/server.js'",
+    "dev": "nodemon --watch src --exec 'npx tsc && node dist/server.js'",
     "ts-start": "ts-node ./src/server.ts",
     "build": "npx tsc",
     "build-start": "npx tsc && node dist/src/server.js"
   },
   "devDependencies": {
     "@telegraf/types": "^7.1.0",
-    "@types/bun": "latest",
     "@types/dotenv": "^8.2.3",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.2",

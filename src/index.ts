@@ -41,7 +41,7 @@ export async function startBot() {
         const webhookDomain = TELEGRAM_BOT_WEBHOOK_DOMAIN as string;
         const webhookPath = `/bot${TELEGRAM_BOT_TOKEN}` as string;
         await bot.telegram.setWebhook(`${webhookDomain}${webhookPath}`);
-
+        // @ts-ignore
         bot.startWebhook(webhookPath, null, process.env.PORT || 3000);
         await bot.launch({
             webhook: {

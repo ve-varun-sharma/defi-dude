@@ -3,7 +3,7 @@
 This is DeFiDude! He's a sarcastic little bugger to help you in the world of Web3, and DeFi!
 He can chat with you over Telegram.
 
-To chat with DeFiDude on telegram, you can [get started here](t.me/DeFiDudeBot).
+To chat with DeFiDude on telegram, you can [get started here](https://t.me/DeFiDudeBot).
 
 ## Installation
 
@@ -41,5 +41,5 @@ Use the no cache flag if you want to hard start building the app. I recommend th
 
 This project uses:
 
-- [Telegraf](https://telegraf.js.org)
-- [Gemini AI](https://www.npmjs.com/package/@google/generative-ai)
+-   [Telegraf](https://telegraf.js.org)
+-   [Gemini AI](https://www.npmjs.com/package/@google/generative-ai)

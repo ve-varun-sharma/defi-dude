@@ -1,3 +1,3 @@
-import { startBot } from "./index";
+import { startBot } from './index';
 
 startBot();

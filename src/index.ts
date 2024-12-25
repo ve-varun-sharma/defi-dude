@@ -7,7 +7,11 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 if (!TELEGRAM_BOT_TOKEN) {
     throw 'Undetected TELEGRAM_BOT_TOKEN! Please ensure an env var for this is added.';
 }
-// const bot = new Telegraf<BotContext>(TELEGRAM_BOT_TOKEN);
+
+const TELEGRAM_BOT_WEBHOOK_DOMAIN = process.env.TELEGRAM_BOT_WEBHOOK_DOMAIN;
+if (!TELEGRAM_BOT_WEBHOOK_DOMAIN) {
+    throw 'Undetected TELEGRAM_BOT_WEBHOOK_DOMAIN! Please ensure an env var for this is added.';
+}
 const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
 
 async function handleTextMessage(ctx: any) {
@@ -33,7 +37,19 @@ function setupBotCommands() {
 export async function startBot() {
     try {
         setupBotCommands();
-        await bot.launch();
+        // await bot.launch();
+        const webhookDomain = TELEGRAM_BOT_WEBHOOK_DOMAIN as string;
+        const webhookPath = `/bot${TELEGRAM_BOT_TOKEN}` as string;
+        await bot.telegram.setWebhook(`${webhookDomain}${webhookPath}`);
+
+        bot.startWebhook(webhookPath, null, process.env.PORT || 3000);
+        await bot.launch({
+            webhook: {
+                domain: webhookDomain,
+                hookPath: webhookPath,
+                port: Number(process.env.PORT) || 3000
+            }
+        });
         console.log('Bot is running...');
     } catch (error) {
         console.error('Failed to start the bot:', error);

@@ -17,6 +17,13 @@ const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
 async function handleTextMessage(ctx: any) {
     const userInput = ctx.message.text;
     try {
+        // Send "typing..." action
+        ctx.sendChatAction('typing');
+
+        // Simulate a delay to show the typing action for a random duration between 2 to 5 seconds
+        const typingDuration = Math.floor(Math.random() * 3000) + 2000;
+        await new Promise((resolve) => setTimeout(resolve, typingDuration));
+
         const aiResponse = await generateAiResponse(userInput);
         ctx.reply(aiResponse.response.text());
     } catch (error) {

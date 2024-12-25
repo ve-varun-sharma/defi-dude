@@ -25,6 +25,20 @@ To run in prod:
 pnpm run start
 ```
 
+## Using Docker
+
+To use docker, build the local app from the Dockerfile, and run it as such.
+Use the no cache flag if you want to hard start building the app. I recommend this especially when making package or dependency changes. Otherwise if you're rebuilding the app from code changes I recommend usin the default build option.
+
+    ```bash
+    docker build --no-cache -t defi_dude .
+    docker build -t defi_dude .
+    docker run defi_dude
+
+    ```
+
+## Resources
+
 This project uses:
 
 - [Telegraf](https://telegraf.js.org)

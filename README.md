@@ -1,21 +1,31 @@
-# telegram_bot
+# DeFiDude Telegram Bot
+
+This is DeFiDude! He's a sarcastic little bugger to help you in the world of Web3, and DeFi!
+He can chat with you over Telegram.
+
+To chat with DeFiDude on telegram, you can [get started here](t.me/DeFiDudeBot).
+
+## Installation
 
 To install dependencies:
 
 ```bash
-bun install
+pnpm i
 ```
 
-To run:
+To run in dev:
 
 ```bash
-bun run index.ts
+pnpm run dev
 ```
 
-This project was created using `bun init` in bun v1.1.4. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+To run in prod:
 
-## YGG Bot Start
+```bash
+pnpm run start
+```
 
-https://github.com/telegraf/telegraf
+This project uses:
 
-You can find [YGG Sherpa Bot here](t.me/YGGSherpaBot)
+- [Telegraf](https://telegraf.js.org)
+- [Gemini AI](https://www.npmjs.com/package/@google/generative-ai)

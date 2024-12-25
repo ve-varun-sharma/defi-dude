@@ -24,11 +24,16 @@ async function handleTextMessage(ctx: any) {
 }
 function setupBotCommands() {
   bot.start((ctx: any) => {
-    ctx.reply("Welcome to DeFiDude bot! Use /help to see available commands.");
+    ctx.reply(
+      "Welcome to DeFiDude bot! Send a message to DeFiDude to get started!"
+    );
   });
 
   bot.help((ctx: any) => ctx.reply("Send me a sticker"));
   bot.on("text", handleTextMessage);
+  bot.on("sticker", (ctx: any) =>
+    ctx.reply("Stickers are cool but I prefer text ;) 👍")
+  );
 }
 
 export async function startBot() {

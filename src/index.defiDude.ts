@@ -3,8 +3,8 @@ import { generateAiResponse } from './helpers/gemini.helpers';
 import { config } from 'dotenv';
 config();
 
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-if (!TELEGRAM_BOT_TOKEN) {
+const TELEGRAM_BOT_TOKEN_DEFI_DUDE = process.env.TELEGRAM_BOT_TOKEN_DEFI_DUDE;
+if (!TELEGRAM_BOT_TOKEN_DEFI_DUDE) {
     throw 'Undetected TELEGRAM_BOT_TOKEN! Please ensure an env var for this is added.';
 }
 
@@ -12,7 +12,7 @@ const TELEGRAM_BOT_WEBHOOK_DOMAIN = process.env.TELEGRAM_BOT_WEBHOOK_DOMAIN;
 if (!TELEGRAM_BOT_WEBHOOK_DOMAIN) {
     throw 'Undetected TELEGRAM_BOT_WEBHOOK_DOMAIN! Please ensure an env var for this is added.';
 }
-const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
+const bot = new Telegraf(TELEGRAM_BOT_TOKEN_DEFI_DUDE);
 
 async function handleTextMessage(ctx: any) {
     const userInput = ctx.message.text;
@@ -41,12 +41,12 @@ function setupBotCommands() {
     bot.on('sticker', (ctx: any) => ctx.reply('Stickers are cool but I prefer text ;) 👍'));
 }
 
-export async function startBot() {
+export async function startDefiDudeBot() {
     try {
         setupBotCommands();
         // await bot.launch();
         const webhookDomain = TELEGRAM_BOT_WEBHOOK_DOMAIN as string;
-        const webhookPath = `/bot${TELEGRAM_BOT_TOKEN}` as string;
+        const webhookPath = `/bot${TELEGRAM_BOT_TOKEN_DEFI_DUDE}` as string;
         await bot.telegram.setWebhook(`${webhookDomain}${webhookPath}`);
         // @ts-ignore
         await bot.launch({

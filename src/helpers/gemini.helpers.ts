@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import { systemPromptV1 } from '../constants/systemPrompt.constants';
+import { systemPromptV1DefDude } from '../constants/systemPrompt.constants';
 import { config } from 'dotenv';
 config();
 
@@ -11,7 +11,7 @@ const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 const model = genAI.getGenerativeModel({
     model: 'gemini-2.0-flash-exp',
-    systemInstruction: systemPromptV1
+    systemInstruction: systemPromptV1DefDude
 });
 
 const generationConfig = {

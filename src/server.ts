@@ -1,3 +1,3 @@
-import { startBot } from './index';
+import { startDefiDudeBot } from './index.defiDude';
 
-startBot();
+startDefiDudeBot();

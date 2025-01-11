@@ -1,5 +1,7 @@
 import { Telegraf } from 'telegraf';
 import { generateAiResponse } from './helpers/gemini.helpers';
+import { systemPromptV1DefDude } from './constants/systemPrompt.constants';
+
 import { config } from 'dotenv';
 config();
 
@@ -24,7 +26,7 @@ async function handleTextMessage(ctx: any) {
         const typingDuration = Math.floor(Math.random() * 2000) + 2000;
         await new Promise((resolve) => setTimeout(resolve, typingDuration));
 
-        const aiResponse = await generateAiResponse(userInput);
+        const aiResponse = await generateAiResponse(systemPromptV1DefDude, userInput);
         ctx.reply(aiResponse.response.text());
     } catch (error) {
         console.error('Error generating AI response:', error);
@@ -44,10 +46,8 @@ function setupBotCommands() {
 export async function startDefiDudeBot() {
     try {
         setupBotCommands();
-        // await bot.launch();
         const webhookDomain = TELEGRAM_BOT_WEBHOOK_DOMAIN as string;
         const webhookPath = `/bot${TELEGRAM_BOT_TOKEN_DEFI_DUDE}` as string;
-        await bot.telegram.setWebhook(`${webhookDomain}${webhookPath}`);
         // @ts-ignore
         await bot.launch({
             webhook: {

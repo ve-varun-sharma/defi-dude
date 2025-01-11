@@ -1,5 +1,4 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import { systemPromptV1DefDude } from '../constants/systemPrompt.constants';
 import { config } from 'dotenv';
 config();
 
@@ -9,11 +8,6 @@ if (!GEMINI_API_KEY) {
 }
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
-const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash-exp',
-    systemInstruction: systemPromptV1DefDude
-});
-
 const generationConfig = {
     temperature: 1,
     topP: 0.95,
@@ -22,7 +16,12 @@ const generationConfig = {
     responseMimeType: 'text/plain'
 };
 
-export async function generateAiResponse(userInput: string) {
+export async function generateAiResponse(systemPrompt: string, userInput: string) {
+    const model = genAI.getGenerativeModel({
+        model: 'gemini-1.5-flash',
+        systemInstruction: systemPrompt
+    });
+
     const chatSession = model.startChat({
         generationConfig,
         // @ts-ignore

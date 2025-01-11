@@ -1,12 +1,11 @@
 import { Telegraf } from 'telegraf';
 import { generateAiResponse } from './helpers/gemini.helpers';
-import { systemPromptV1DefDude } from './constants/systemPrompt.constants';
-
+import { systemPromptV1YGGGuildy } from './constants/systemPrompt.constants';
 import { config } from 'dotenv';
 config();
 
-const TELEGRAM_BOT_TOKEN_DEFI_DUDE = process.env.TELEGRAM_BOT_TOKEN_DEFI_DUDE;
-if (!TELEGRAM_BOT_TOKEN_DEFI_DUDE) {
+const TELEGRAM_BOT_TOKEN_YGG_GUILDY = process.env.TELEGRAM_BOT_TOKEN_YGG_GUILDY;
+if (!TELEGRAM_BOT_TOKEN_YGG_GUILDY) {
     throw 'Undetected TELEGRAM_BOT_TOKEN! Please ensure an env var for this is added.';
 }
 
@@ -14,7 +13,7 @@ const TELEGRAM_BOT_WEBHOOK_DOMAIN = process.env.TELEGRAM_BOT_WEBHOOK_DOMAIN;
 if (!TELEGRAM_BOT_WEBHOOK_DOMAIN) {
     throw 'Undetected TELEGRAM_BOT_WEBHOOK_DOMAIN! Please ensure an env var for this is added.';
 }
-const bot = new Telegraf(TELEGRAM_BOT_TOKEN_DEFI_DUDE);
+const bot = new Telegraf(TELEGRAM_BOT_TOKEN_YGG_GUILDY);
 
 async function handleTextMessage(ctx: any) {
     const userInput = ctx.message.text;
@@ -26,16 +25,16 @@ async function handleTextMessage(ctx: any) {
         const typingDuration = Math.floor(Math.random() * 2000) + 2000;
         await new Promise((resolve) => setTimeout(resolve, typingDuration));
 
-        const aiResponse = await generateAiResponse(systemPromptV1DefDude, userInput);
+        const aiResponse = await generateAiResponse(systemPromptV1YGGGuildy, userInput);
         ctx.reply(aiResponse);
     } catch (error) {
         console.error('Error generating AI response:', error);
-        ctx.reply("Sorry, there was an error processing your request to DeFi Dude - ya'll are wearing him out.");
+        ctx.reply("Sorry, there was an error processing your request to Guildy - ya'll are wearing him out.");
     }
 }
 function setupBotCommands() {
     bot.start((ctx: any) => {
-        ctx.reply('Welcome to DeFiDude bot! Send a message to DeFiDude to get started!');
+        ctx.reply('Welcome to  Guildy bot! Send a message to Guildy to get started!');
     });
 
     bot.help((ctx: any) => ctx.reply('Send me a sticker'));
@@ -43,13 +42,13 @@ function setupBotCommands() {
     bot.on('sticker', (ctx: any) => ctx.reply('Stickers are cool but I prefer text ;) 👍'));
 }
 
-export async function startDefiDudeBot() {
+export async function startYGGGuildyBot() {
     try {
         setupBotCommands();
         const webhookDomain = TELEGRAM_BOT_WEBHOOK_DOMAIN as string;
-        const webhookPath = `/bot${TELEGRAM_BOT_TOKEN_DEFI_DUDE}` as string;
+        const webhookPath = `/bot${TELEGRAM_BOT_TOKEN_YGG_GUILDY}` as string;
         // @ts-ignore
-        await bot.launch({
+        bot.launch({
             webhook: {
                 domain: webhookDomain,
                 hookPath: webhookPath,

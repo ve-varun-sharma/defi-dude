@@ -23,6 +23,7 @@
         "@google/generative-ai": "^0.21.0",
         "dotenv": "^16.4.7",
         "express": "^4.21.2",
-        "telegraf": "^4.16.3"
+        "telegraf": "^4.16.3",
+        "zod": "^3.24.1"
     }
 }

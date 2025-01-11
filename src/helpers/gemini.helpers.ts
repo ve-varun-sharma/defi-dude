@@ -1,5 +1,5 @@
 import { z, ZodObject } from 'zod';
-import { GoogleGenerativeAI, FunctionDeclaration, FunctionDeclarationSchema, FunctionDeclarationsTool } from '@google/generative-ai';
+import { GoogleGenerativeAI, FunctionDeclaration, FunctionDeclarationSchema, FunctionDeclarationsTool, Content } from '@google/generative-ai';
 import { config } from 'dotenv';
 config();
 
@@ -16,6 +16,7 @@ const generationConfig = {
     maxOutputTokens: 8192,
     responseMimeType: 'text/plain'
 };
+
 // Utility function to convert Zod schema to JSON schema
 function zodToJsonSchema(zodSchema: ZodObject<any>): any {
     const jsonSchema: any = { type: 'object', properties: {}, required: [] };
@@ -112,8 +113,8 @@ function extractParameters(userInput: string, schema: ZodObject<any>): any {
     return params;
 }
 
-// Generate AI response with retry mechanism
-export async function generateAiResponse(systemPrompt: string, userInput: string, retries = 3): Promise<string> {
+// Generate AI response with retry mechanism and chat history
+export async function generateAiResponse(systemPrompt: string, userInput: string, chatHistory: Content[], retries = 3): Promise<string> {
     const model = genAI.getGenerativeModel({
         model: 'gemini-1.5-flash',
         systemInstruction: systemPrompt,
@@ -122,8 +123,7 @@ export async function generateAiResponse(systemPrompt: string, userInput: string
 
     const chatSession = model.startChat({
         generationConfig,
-        // @ts-ignore
-        history: []
+        history: chatHistory // Pass the chat history to the model
     });
 
     // Check if the user input matches any keyword in the function mapping
@@ -135,13 +135,17 @@ export async function generateAiResponse(systemPrompt: string, userInput: string
             console.log(`${keyword} Data:`, result);
 
             // Format the result into a readable message
+            let message = '';
             if (keyword === 'weather') {
-                const message = `Current temperature at latitude ${params.latitude}, longitude ${params.longitude}: ${result.current.temperature_2m}°C`;
-                return message;
+                message = `Current temperature at latitude ${params.latitude}, longitude ${params.longitude}: ${result.current.temperature_2m}°C`;
             } else if (keyword === 'time') {
-                const message = `Current time in ${params.timeZone}: ${result}`;
-                return message;
+                message = `Current time in ${params.timeZone}: ${result}`;
             }
+
+            chatHistory.push({ role: 'user', parts: [{ text: userInput }] });
+            chatHistory.push({ role: 'model', parts: [{ text: message }] });
+
+            return message;
         }
     }
 
@@ -149,6 +153,10 @@ export async function generateAiResponse(systemPrompt: string, userInput: string
         const result = await chatSession.sendMessage(userInput); // Process user input
         if (result.response && result.response.text) {
             console.log(result.response.text());
+
+            // Update chat history
+            chatHistory.push({ role: 'user', parts: [{ text: userInput }] });
+            chatHistory.push({ role: 'model', parts: [{ text: result.response.text() }] });
             return result.response.text();
         } else {
             console.error('No response from AI model');
@@ -158,7 +166,7 @@ export async function generateAiResponse(systemPrompt: string, userInput: string
         if (error.status === 429 && retries > 0) {
             console.warn(`Rate limited. Retrying after delay... (${retries} retries left)`);
             await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for 1 second before retrying
-            return generateAiResponse(systemPrompt, userInput, retries - 1);
+            return generateAiResponse(systemPrompt, userInput, chatHistory, retries - 1);
         } else {
             throw error;
         }

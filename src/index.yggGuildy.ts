@@ -1,6 +1,8 @@
 import { Telegraf } from 'telegraf';
 import { generateAiResponse } from './helpers/gemini.helpers';
 import { systemPromptV1YGGGuildy } from './constants/systemPrompt.constants';
+import { Content } from '@google/generative-ai';
+
 import { config } from 'dotenv';
 config();
 
@@ -14,6 +16,7 @@ if (!TELEGRAM_BOT_WEBHOOK_DOMAIN) {
     throw 'Undetected TELEGRAM_BOT_WEBHOOK_DOMAIN! Please ensure an env var for this is added.';
 }
 const bot = new Telegraf(TELEGRAM_BOT_TOKEN_YGG_GUILDY);
+const chatHistory: Content[] = [];
 
 async function handleTextMessage(ctx: any) {
     const userInput = ctx.message.text;
@@ -25,7 +28,7 @@ async function handleTextMessage(ctx: any) {
         const typingDuration = Math.floor(Math.random() * 2000) + 2000;
         await new Promise((resolve) => setTimeout(resolve, typingDuration));
 
-        const aiResponse = await generateAiResponse(systemPromptV1YGGGuildy, userInput);
+        const aiResponse = await generateAiResponse(systemPromptV1YGGGuildy, userInput, chatHistory);
         ctx.reply(aiResponse);
     } catch (error) {
         console.error('Error generating AI response:', error);

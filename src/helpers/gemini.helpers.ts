@@ -72,6 +72,19 @@ const getCurrentTimeFunctionDeclaration: FunctionDeclaration = {
     parameters: getCurrentTimeParametersJsonSchema as unknown as FunctionDeclarationSchema
 };
 
+const getWalletSummaryParametersSchema = z.object({
+    address: z.string().describe('Ethereum wallet address')
+});
+
+// Convert the Zod schema to a plain JSON schema
+const getWalletSummaryParametersJsonSchema = zodToJsonSchema(getWalletSummaryParametersSchema);
+
+// Define the function declaration
+const getWalletSummaryFunctionDeclaration: FunctionDeclaration = {
+    name: 'getWalletSummary',
+    description: 'Get a summary of a Web3 wallet from Etherscan',
+    parameters: getWalletSummaryParametersJsonSchema as unknown as FunctionDeclarationSchema
+};
 // Define the execute function for getCurrentTime
 function getCurrentTime({ timeZone }: { timeZone: string }): string {
     const now = new Date();
@@ -80,10 +93,35 @@ function getCurrentTime({ timeZone }: { timeZone: string }): string {
     return `${date} ${time}`;
 }
 
+// Define the execute function separately
+async function getWalletSummary({ address }: { address: string }) {
+    const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
+    if (!ETHERSCAN_API_KEY) {
+        throw 'No ETHERSCAN_API_KEY detected!';
+    }
+
+    const response = await fetch(
+        `https://api.etherscan.io/api?module=account&action=balance&address=${address}&tag=latest&apikey=${ETHERSCAN_API_KEY}`
+    );
+    const balanceData = await response.json();
+
+    const txResponse = await fetch(
+        `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`
+    );
+    const txData = await txResponse.json();
+
+    // Convert balance from Wei to ETH and format to 4 decimal places
+    const balanceInEth = (parseFloat(balanceData.result) / 1e18).toFixed(4);
+
+    return {
+        balance: balanceInEth,
+        transactions: txData.result
+    };
+}
 // Register the functions as tools
 const tools: FunctionDeclarationsTool[] = [
     {
-        functionDeclarations: [getWeatherFunctionDeclaration, getCurrentTimeFunctionDeclaration]
+        functionDeclarations: [getWeatherFunctionDeclaration, getCurrentTimeFunctionDeclaration, getWalletSummaryFunctionDeclaration]
     }
 ];
 
@@ -96,6 +134,10 @@ const functionMapping: { [key: string]: { func: Function; schema: ZodObject<any>
     time: {
         func: getCurrentTime,
         schema: getCurrentTimeParametersSchema
+    },
+    wallet: {
+        func: getWalletSummary,
+        schema: getWalletSummaryParametersSchema
     }
 };
 
@@ -110,6 +152,8 @@ function extractParameters(userInput: string, schema: ZodObject<any>): any {
             params[key] = match[1];
         }
     });
+    console.log('Extracted parameters:', params); // Add logging to debug
+
     return params;
 }
 
@@ -125,6 +169,24 @@ export async function generateAiResponse(systemPrompt: string, userInput: string
         generationConfig,
         history: chatHistory // Pass the chat history to the model
     });
+
+    // Check if the user input contains an Ethereum address
+    const addressMatch = userInput.match(/0x[a-fA-F0-9]{40}/);
+    if (addressMatch) {
+        const address = addressMatch[0];
+        const result = await getWalletSummary({ address });
+
+        // Generate a prompt for the AI to create a funny and sarcastic summary
+        const prompt = `Here is the wallet summary:\nBalance: ${result.balance} ETH\nTransactions:\n${result.transactions}`;
+        const aiResponse = await chatSession.sendMessage(prompt + 'Please provide a funny and sarcastic summary of this wallet.');
+        const message = aiResponse.response.text();
+
+        // Update chat history
+        chatHistory.push({ role: 'user', parts: [{ text: userInput }] });
+        chatHistory.push({ role: 'model', parts: [{ text: message }] });
+
+        return message;
+    }
 
     // Check if the user input matches any keyword in the function mapping
     for (const keyword in functionMapping) {
@@ -142,6 +204,7 @@ export async function generateAiResponse(systemPrompt: string, userInput: string
                 message = `Current time in ${params.timeZone}: ${result}`;
             }
 
+            // Update chat history
             chatHistory.push({ role: 'user', parts: [{ text: userInput }] });
             chatHistory.push({ role: 'model', parts: [{ text: message }] });
 

@@ -16,10 +16,19 @@ if (!TELEGRAM_BOT_WEBHOOK_DOMAIN) {
     throw 'Undetected TELEGRAM_BOT_WEBHOOK_DOMAIN! Please ensure an env var for this is added.';
 }
 const bot = new Telegraf(TELEGRAM_BOT_TOKEN_YGG_GUILDY);
-const chatHistory: Content[] = [];
+
+// Mapping of user IDs to their chat histories
+const userChatHistories: { [userId: string]: Content[] } = {};
+// TODO: Pull chat history from telegram.
 
 async function handleTextMessage(ctx: any) {
+    const userId = ctx.message.from.id.toString();
     const userInput = ctx.message.text;
+
+    // Initialize chat history for the user if it doesn't exist
+    if (!userChatHistories[userId]) {
+        userChatHistories[userId] = [];
+    }
     try {
         // Send "typing..." action
         ctx.sendChatAction('typing');
@@ -28,7 +37,7 @@ async function handleTextMessage(ctx: any) {
         const typingDuration = Math.floor(Math.random() * 2000) + 2000;
         await new Promise((resolve) => setTimeout(resolve, typingDuration));
 
-        const aiResponse = await generateAiResponse(systemPromptV1YGGGuildy, userInput, chatHistory);
+        const aiResponse = await generateAiResponse(systemPromptV1YGGGuildy, userInput, userChatHistories[userId]);
         ctx.reply(aiResponse);
     } catch (error) {
         console.error('Error generating AI response:', error);

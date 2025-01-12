@@ -33,10 +33,6 @@ async function handleTextMessage(ctx: any) {
         // Send "typing..." action
         ctx.sendChatAction('typing');
 
-        // Simulate a delay to show the typing action for a random duration between 2 to 5 seconds
-        const typingDuration = Math.floor(Math.random() * 2000) + 2000;
-        await new Promise((resolve) => setTimeout(resolve, typingDuration));
-
         const aiResponse = await generateAiResponse(systemPromptV1YGGGuildy, userInput, userChatHistories[userId]);
         ctx.reply(aiResponse);
     } catch (error) {
